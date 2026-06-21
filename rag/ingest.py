@@ -21,3 +21,30 @@ def embed_batch(texts):
         model="text-embedding-3-small"
     )
     return [r.embedding for r in response.data]
+
+# ── Ingest ────────────────────────────────────────────────────────────────────
+def ingest():
+    df = load_clean()
+    facts = generate_facts(df)
+    print(f"Ingesting {len(facts)} facts into ChromaDB...")
+
+    collection = chroma.get_or_create_collection(name=COLLECTION)
+
+    # Batch embed (50 at a time)
+    batch_size = 50
+    all_embeddings = []
+    for i in range(0, len(facts), batch_size):
+        batch = facts[i:i+batch_size]
+        embeddings = embed_batch(batch)
+        all_embeddings.extend(embeddings)
+        print(f"  Embedded {min(i+batch_size, len(facts))}/{len(facts)}")
+
+    collection.upsert(
+        ids=[f"fact_{i}" for i in range(len(facts))],
+        embeddings=all_embeddings,
+        documents=facts
+    )
+    print(f"Done! {len(facts)} facts stored in ChromaDB.")
+
+if __name__ == '__main__':
+    ingest()
