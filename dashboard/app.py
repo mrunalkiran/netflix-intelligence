@@ -10,3 +10,13 @@ from pipeline.analyse import (
     content_per_year, top_countries, ratings_distribution
 )
 from rag.query import ask
+
+# ── Page config ───────────────────────────────────────────────────────────────
+st.set_page_config(
+    page_title="Netflix Intelligence",
+    page_icon="🎬",
+    layout="wide"
+)
+
+st.title("🎬 Netflix Content Intelligence Platform")
+st.caption("Analytics dashboard + AI analyst powered by RAG")
