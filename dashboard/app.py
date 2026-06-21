@@ -32,6 +32,15 @@ st.markdown("""
         font-family: 'Inter', sans-serif;
     }
 
+    /* Remove top padding */
+    .block-container {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+    [data-testid="stAppViewContainer"] > div:first-child {
+        padding-top: 0 !important;
+    }
+
     /* Hide default streamlit elements */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
