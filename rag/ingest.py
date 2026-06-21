@@ -13,3 +13,11 @@ client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 CHROMA_DIR = os.path.join(os.path.dirname(__file__), '..', 'chroma_db')
 chroma = chromadb.PersistentClient(path=CHROMA_DIR)
 COLLECTION = "netflix_facts"
+
+# ── Embed ─────────────────────────────────────────────────────────────────────
+def embed_batch(texts):
+    response = client.embeddings.create(
+        input=texts,
+        model="text-embedding-3-small"
+    )
+    return [r.embedding for r in response.data]
