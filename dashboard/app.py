@@ -27,3 +27,12 @@ def get_data():
     return load_clean()
 
 df = get_data()
+
+# ── Sidebar filters ───────────────────────────────────────────────────────────
+st.sidebar.header("Filters")
+content_type = st.sidebar.multiselect(
+    "Content Type",
+    options=df['type'].unique(),
+    default=df['type'].unique()
+)
+df = df[df['type'].isin(content_type)]
