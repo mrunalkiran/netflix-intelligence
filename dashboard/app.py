@@ -25,3 +25,5 @@ st.caption("Analytics dashboard + AI analyst powered by RAG")
 @st.cache_data
 def get_data():
     return load_clean()
+
+df = get_data()
