@@ -20,3 +20,8 @@ st.set_page_config(
 
 st.title("🎬 Netflix Content Intelligence Platform")
 st.caption("Analytics dashboard + AI analyst powered by RAG")
+
+# ── Load data ─────────────────────────────────────────────────────────────────
+@st.cache_data
+def get_data():
+    return load_clean()
