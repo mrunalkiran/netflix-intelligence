@@ -26,3 +26,35 @@ def retrieve(question, top_k=5):
     )
     return results['documents'][0]
 
+# ── Answer ────────────────────────────────────────────────────────────────────
+def ask(question):
+    chunks = retrieve(question)
+    context = "\n".join(f"- {c}" for c in chunks)
+
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are a Netflix content analyst. "
+                    "Answer questions using ONLY the facts below. "
+                    "Be concise and insightful.\n\n"
+                    f"Facts:\n{context}"
+                )
+            },
+            {"role": "user", "content": question}
+        ]
+    )
+    return response.choices[0].message.content, chunks
+
+if __name__ == '__main__':
+    questions = [
+        "Which country produces the most Netflix content?",
+        "What is the most common genre on Netflix?",
+        "How has Netflix grown over the years?",
+    ]
+    for q in questions:
+        print(f"\nQ: {q}")
+        answer, _ = ask(q)
+        print(f"A: {answer}")
