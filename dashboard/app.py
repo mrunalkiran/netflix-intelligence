@@ -36,3 +36,11 @@ content_type = st.sidebar.multiselect(
     default=df['type'].unique()
 )
 df = df[df['type'].isin(content_type)]
+
+# ── Metrics row ───────────────────────────────────────────────────────────────
+col1, col2, col3, col4 = st.columns(4)
+col1.metric("Total Titles", f"{len(df):,}")
+col2.metric("Movies", f"{len(df[df['type']=='Movie']):,}")
+col3.metric("TV Shows", f"{len(df[df['type']=='TV Show']):,}")
+col4.metric("Countries", f"{df['country'].nunique():,}")
+
