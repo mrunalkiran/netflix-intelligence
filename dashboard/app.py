@@ -267,12 +267,8 @@ df = get_data()
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("""
-        <div style='padding: 16px 0 24px'>
-            <div style='font-size:1.4rem;font-weight:700;color:#fff'>🎬 Netflix IQ</div>
-            <div style='font-size:0.75rem;color:#555;margin-top:4px'>Intelligence Platform</div>
-        </div>
-    """, unsafe_allow_html=True)
+    st.image("images/netflix_logo.png", width=130)
+    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
     st.markdown("<div style='font-size:0.75rem;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px'>Filters</div>", unsafe_allow_html=True)
 
@@ -372,7 +368,7 @@ with tab1:
             template=TEMPLATE,
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
-            height=380,
+            height=620,
             margin=dict(l=0, r=40, t=10, b=0),
             yaxis=dict(categoryorder='total ascending', gridcolor='#1a1a1a', color='#666'),
             xaxis=dict(gridcolor='#1a1a1a', color='#444'),
@@ -513,6 +509,28 @@ with tab3:
     per_year = content_per_year(df_f)
     per_year = per_year[per_year['year_added'] >= 2010]
 
+    # Calculate year-over-year growth %
+    per_year['pct_change'] = per_year['count'].pct_change() * 100
+    per_year['pct_change'] = per_year['pct_change'].fillna(0).round(1)
+
+    # Best genre per year
+    def best_genre_for_year(year):
+        subset = df_f[df_f['year_added'] == year]
+        if subset.empty:
+            return 'N/A'
+        genres = subset['listed_in'].str.split(',').explode().str.strip()
+        return genres.value_counts().idxmax() if not genres.empty else 'N/A'
+
+    per_year['top_genre'] = per_year['year_added'].apply(best_genre_for_year)
+
+    # Build custom hover text
+    per_year['hover_text'] = per_year.apply(lambda row: (
+        f"<b>{int(row['year_added'])}</b><br>"
+        f"📦 Titles Added: <b>{int(row['count']):,}</b><br>"
+        f"📈 Growth: <b>{'↑' if row['pct_change'] >= 0 else '↓'} {abs(row['pct_change'])}%</b><br>"
+        f"🎭 Top Genre: <b>{row['top_genre']}</b>"
+    ), axis=1)
+
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=per_year['year_added'],
@@ -521,9 +539,11 @@ with tab3:
         fillcolor='rgba(229,9,20,0.15)',
         line=dict(color=NETFLIX_RED, width=3),
         mode='lines+markers',
-        marker=dict(size=8, color=NETFLIX_RED, line=dict(color='white', width=2)),
-        hovertemplate='<b>%{x}</b><br>%{y} titles added<extra></extra>'
+        marker=dict(size=10, color=NETFLIX_RED, line=dict(color='white', width=2)),
+        hovertemplate='%{customdata}<extra></extra>',
+        customdata=per_year['hover_text']
     ))
+
     fig.update_layout(
         template=TEMPLATE,
         paper_bgcolor='rgba(0,0,0,0)',
@@ -532,7 +552,12 @@ with tab3:
         margin=dict(l=0, r=0, t=10, b=0),
         xaxis=dict(gridcolor='#1a1a1a', color='#666', tickmode='linear', dtick=1),
         yaxis=dict(gridcolor='#1a1a1a', color='#444'),
-        hovermode='x unified'
+        hovermode='closest',
+        hoverlabel=dict(
+            bgcolor='#1a0000',
+            bordercolor='#E50914',
+            font=dict(color='white', size=13, family='Inter'),
+        ),
     )
     st.plotly_chart(fig, use_container_width=True)
 
