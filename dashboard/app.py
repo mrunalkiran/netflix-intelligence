@@ -46,9 +46,25 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
 
-    /* Main background */
+    /* Cinematic background */
     .stApp {
         background-color: #0a0a0a;
+        background-image:
+            linear-gradient(rgba(10,10,10,0.92), rgba(10,10,10,0.92)),
+            repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 120px,
+                rgba(229,9,20,0.03) 120px,
+                rgba(229,9,20,0.03) 121px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 120px,
+                rgba(229,9,20,0.03) 120px,
+                rgba(229,9,20,0.03) 121px
+            );
     }
 
     /* Sidebar */
@@ -337,7 +353,7 @@ for icon, val, label, col in metrics:
 st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
 
 # ── Tabs ──────────────────────────────────────────────────────────────────────
-tab1, tab2, tab3, tab4 = st.tabs(["🎭  Genres", "🌍  Countries", "📈  Growth", "🤖  Ask AI"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["🎭  Genres", "🌍  Countries", "📈  Growth", "🎬  Directors", "🤖  Ask AI"])
 
 # Plotly dark template
 TEMPLATE = "plotly_dark"
@@ -374,7 +390,7 @@ with tab1:
             xaxis=dict(gridcolor='#1a1a1a', color='#444'),
             showlegend=False
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
     with col2:
         st.markdown('<div class="section-header">🍩 Content Split</div>', unsafe_allow_html=True)
@@ -460,7 +476,7 @@ with tab2:
             yaxis=dict(categoryorder='total ascending', gridcolor='#1a1a1a', color='#666'),
             xaxis=dict(gridcolor='#1a1a1a', color='#444'),
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width='stretch')
 
     with col2:
         fig2 = go.Figure(go.Choropleth(
@@ -559,7 +575,7 @@ with tab3:
             font=dict(color='white', size=13, family='Inter'),
         ),
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
     # Stats row
     peak = per_year.loc[per_year['count'].idxmax()]
@@ -583,8 +599,81 @@ with tab3:
         <div class="metric-label">Avg Titles Per Year</div>
     </div>""", unsafe_allow_html=True)
 
-# ── Tab 4: Ask AI ─────────────────────────────────────────────────────────────
+# ── Tab 4: Directors ──────────────────────────────────────────────────────────
 with tab4:
+    st.markdown('<div class="section-header">🎬 Top Directors on Netflix</div>', unsafe_allow_html=True)
+
+    col1, col2 = st.columns([3, 2], gap="large")
+
+    with col1:
+        directors = top_directors(df_f, top_n=15)
+        fig = go.Figure(go.Bar(
+            x=directors['director'],
+            y=directors['count'],
+            marker=dict(
+                color=directors['count'],
+                colorscale=[[0, '#3d0000'], [1, '#E50914']],
+                showscale=False
+            ),
+            text=directors['count'],
+            textposition='outside',
+            textfont=dict(color='#888', size=11)
+        ))
+        fig.update_layout(
+            template=TEMPLATE,
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            height=420,
+            margin=dict(l=0, r=0, t=10, b=0),
+            xaxis=dict(gridcolor='#1a1a1a', color='#666', tickangle=-35),
+            yaxis=dict(gridcolor='#1a1a1a', color='#444', title='Number of Titles'),
+            showlegend=False,
+            hoverlabel=dict(
+                bgcolor='#1a0000',
+                bordercolor='#E50914',
+                font=dict(color='white', size=13)
+            )
+        )
+        st.plotly_chart(fig, width='stretch')
+
+    with col2:
+        st.markdown('<div class="section-header">📋 Director Details</div>', unsafe_allow_html=True)
+        directors_detail = df_f[df_f['director'] != 'Unknown'].groupby('director').agg(
+            titles=('title', 'count'),
+            types=('type', lambda x: ', '.join(x.unique())),
+            genres=('listed_in', lambda x: x.value_counts().idxmax()),
+            latest=('release_year', 'max')
+        ).reset_index().sort_values('titles', ascending=False).head(15)
+
+        for _, row in directors_detail.iterrows():
+            st.markdown(f"""
+                <div style='background:#111;border:1px solid #222;border-radius:10px;
+                            padding:14px;margin-bottom:10px;transition:border-color 0.2s'
+                     onmouseover="this.style.borderColor='#E50914'"
+                     onmouseout="this.style.borderColor='#222'">
+                    <div style='font-weight:600;color:#fff;font-size:0.95rem'>{row['director']}</div>
+                    <div style='color:#555;font-size:0.75rem;margin-top:6px;display:flex;gap:12px'>
+                        <span>🎬 {row['titles']} titles</span>
+                        <span>📺 {row['types']}</span>
+                        <span>📅 Latest: {int(row['latest'])}</span>
+                    </div>
+                    <div style='color:#444;font-size:0.72rem;margin-top:4px'>
+                        🎭 {row['genres'][:40]}...
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
+
+    top_dir = directors_detail.iloc[0]
+    st.markdown(f"""
+        <div class="insight-box">
+            💡 <strong>{top_dir['director']}</strong> is Netflix's most prolific director
+            with <strong>{top_dir['titles']} titles</strong> —
+            primarily known for <strong>{top_dir['genres'][:30]}</strong> content.
+        </div>
+    """, unsafe_allow_html=True)
+
+# ── Tab 5: Ask AI ─────────────────────────────────────────────────────────────
+with tab5:
     st.markdown("""
         <div style='margin-bottom:24px'>
             <div style='font-size:1.3rem;font-weight:600;color:#fff;margin-bottom:6px'>
