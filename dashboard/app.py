@@ -354,7 +354,7 @@ for icon, val, label, col in metrics:
 st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
 
 # ── Tabs ──────────────────────────────────────────────────────────────────────
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["🎭  Genres", "🌍  Countries", "📈  Growth", "🎬  Directors", "🔍  Explorer", "🤖  Ask AI"])
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["🎭  Genres", "🌍  Countries", "📈  Growth", "🎬  Directors", "🔍  Explorer", "🍿  Recommender", "🤖  Ask AI"])
 
 # Plotly dark template
 TEMPLATE = "plotly_dark"
@@ -803,8 +803,151 @@ with tab5:
             </div>
         """, height=620, scrolling=False)
 
-# ── Tab 6: Ask AI
+# ── Tab 6: Recommender ────────────────────────────────────────────────────────
 with tab6:
+    st.markdown("""
+        <div style='margin-bottom:24px'>
+            <div style='font-size:1.3rem;font-weight:600;color:#fff;margin-bottom:6px'>
+                🍿 AI Content Recommender
+            </div>
+            <div style='font-size:0.85rem;color:#555'>
+                Tell us what you liked and we'll find similar titles from Netflix's catalogue
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # ── Input section ─────────────────────────────────────────────────────────
+    col1, col2 = st.columns([3, 1], gap="large")
+
+    with col1:
+        liked_title = st.text_input(
+            "Title you liked:",
+            placeholder="e.g. Squid Game, Breaking Bad, The Crown...",
+            label_visibility="collapsed"
+        )
+
+    with col2:
+        rec_type = st.selectbox(
+            "Type",
+            ["Any", "Movie", "TV Show"],
+            label_visibility="collapsed"
+        )
+
+    # ── Suggestion chips ──────────────────────────────────────────────────────
+    st.markdown("<div style='font-size:0.8rem;color:#555;margin-bottom:10px'>Try these:</div>", unsafe_allow_html=True)
+    suggestions = ["Squid Game", "Breaking Bad", "The Crown", "Bird Box", "Narcos"]
+    cols = st.columns(5)
+    for i, s in enumerate(suggestions):
+        if cols[i].button(s, key=f"rec_{i}"):
+            st.session_state['rec_title'] = s
+
+    if 'rec_title' in st.session_state:
+        liked_title = st.session_state['rec_title']
+
+    # ── Get recommendations ───────────────────────────────────────────────────
+    if st.button("🍿 Get Recommendations", type="primary") and liked_title:
+        with st.spinner(f"Finding titles similar to '{liked_title}'..."):
+
+            # Build smart query
+            type_filter = f" Focus only on {rec_type}s." if rec_type != "Any" else ""
+            query = (
+                f"I really enjoyed watching '{liked_title}'. "
+                f"What are similar Netflix titles I would like based on genre, "
+                f"theme, tone and storytelling style?{type_filter}"
+            )
+
+            # Get RAG answer
+            answer, sources = ask(query)
+
+        # ── AI Answer ─────────────────────────────────────────────────────────
+        st.markdown(f"""
+            <div style='background:linear-gradient(135deg,#1a0000,#111);
+                        border:1px solid rgba(229,9,20,0.3);
+                        border-left:3px solid #E50914;
+                        border-radius:12px;padding:20px;margin:16px 0'>
+                <div style='font-size:0.7rem;color:#E50914;font-weight:600;
+                            text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px'>
+                    🤖 AI Recommendations
+                </div>
+                <div style='color:#ddd;font-size:0.95rem;line-height:1.7'>{answer}</div>
+            </div>
+        """, unsafe_allow_html=True)
+
+        # ── Matched titles from dataset ────────────────────────────────────────
+        st.markdown("<div style='font-size:0.9rem;font-weight:600;color:#fff;margin:20px 0 12px'>📋 Matched from Netflix catalogue:</div>", unsafe_allow_html=True)
+
+        # Extract titles mentioned in sources
+        matched_cards = ""
+        shown = 0
+        for source in sources:
+            # Find matching title in dataframe
+            for _, row in df.iterrows():
+                if (str(row['title']).lower() in source.lower() and
+                    str(row['title']).lower() != liked_title.lower() and
+                    shown < 6):
+
+                    content_icon = "🎥" if row['type'] == "Movie" else "📺"
+                    duration = str(row['duration']) if pd.notna(row['duration']) else "N/A"
+                    country = str(row['country']).split(',')[0].strip() if pd.notna(row['country']) else "Unknown"
+                    description = str(row['description'])[:120] + "..." if pd.notna(row['description']) else ""
+                    year = int(row['release_year']) if pd.notna(row['release_year']) else "N/A"
+                    rating = str(row['rating']) if pd.notna(row['rating']) else "N/A"
+                    genres = str(row['listed_in'])[:40] if pd.notna(row['listed_in']) else ""
+
+                    matched_cards += f"""
+                        <div style='background:#111;border:1px solid #222;border-radius:12px;
+                                    padding:16px;margin-bottom:10px'>
+                            <div style='display:flex;justify-content:space-between'>
+                                <div style='font-size:1rem;font-weight:600;color:#fff'>
+                                    {content_icon} {row['title']}
+                                </div>
+                                <span style='background:rgba(229,9,20,0.15);
+                                             border:1px solid rgba(229,9,20,0.3);
+                                             color:#E50914;padding:3px 10px;
+                                             border-radius:20px;font-size:0.7rem;
+                                             font-weight:600'>{rating}</span>
+                            </div>
+                            <div style='font-size:0.75rem;color:#555;margin-top:4px'>
+                                📅 {year} &nbsp;|&nbsp; ⏱ {duration} &nbsp;|&nbsp; 🌍 {country}
+                            </div>
+                            <div style='font-size:0.78rem;color:#444;margin-top:8px;line-height:1.5'>
+                                {description}
+                            </div>
+                            <div style='font-size:0.7rem;color:#333;margin-top:6px'>
+                                🎭 {genres}
+                            </div>
+                        </div>
+                    """
+                    shown += 1
+                    break
+
+        if matched_cards:
+            import streamlit.components.v1 as components
+            components.html(f"""
+                <style>
+                    body {{ margin:0;background:transparent;font-family:Inter,sans-serif; }}
+                    ::-webkit-scrollbar {{ width:4px; }}
+                    ::-webkit-scrollbar-track {{ background:#1a1a1a; }}
+                    ::-webkit-scrollbar-thumb {{ background:#E50914;border-radius:4px; }}
+                </style>
+                <div style='max-height:500px;overflow-y:auto;padding-right:8px'>
+                    {matched_cards}
+                </div>
+            """, height=520, scrolling=False)
+        else:
+            st.markdown("""
+                <div style='color:#444;font-size:0.85rem;margin-top:8px'>
+                    💡 Try searching for a more popular title for better matches!
+                </div>
+            """, unsafe_allow_html=True)
+
+        # ── Sources expander ──────────────────────────────────────────────────
+        with st.expander("📄 Data sources used"):
+            for s in sources:
+                st.markdown(f"<div style='font-size:0.8rem;color:#555;margin-bottom:6px'>📊 {s[:100]}...</div>", unsafe_allow_html=True)
+
+# ── Tab 7: Ask AI
+with tab7:
     st.markdown("""
         <div style='margin-bottom:24px'>
             <div style='font-size:1.3rem;font-weight:600;color:#fff;margin-bottom:6px'>
