@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -353,7 +354,7 @@ for icon, val, label, col in metrics:
 st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
 
 # ── Tabs ──────────────────────────────────────────────────────────────────────
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["🎭  Genres", "🌍  Countries", "📈  Growth", "🎬  Directors", "🤖  Ask AI"])
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["🎭  Genres", "🌍  Countries", "📈  Growth", "🎬  Directors", "🔍  Explorer", "🤖  Ask AI"])
 
 # Plotly dark template
 TEMPLATE = "plotly_dark"
@@ -645,12 +646,12 @@ with tab4:
             latest=('release_year', 'max')
         ).reset_index().sort_values('titles', ascending=False).head(15)
 
+        # Build all cards as one HTML block inside a scrollable div
+        cards_html = "<div style='height:420px;overflow-y:auto;padding-right:8px;scrollbar-width:thin;scrollbar-color:#E50914 #1a1a1a;'>"
         for _, row in directors_detail.iterrows():
-            st.markdown(f"""
+            cards_html += f"""
                 <div style='background:#111;border:1px solid #222;border-radius:10px;
-                            padding:14px;margin-bottom:10px;transition:border-color 0.2s'
-                     onmouseover="this.style.borderColor='#E50914'"
-                     onmouseout="this.style.borderColor='#222'">
+                            padding:14px;margin-bottom:10px'>
                     <div style='font-weight:600;color:#fff;font-size:0.95rem'>{row['director']}</div>
                     <div style='color:#555;font-size:0.75rem;margin-top:6px;display:flex;gap:12px'>
                         <span>🎬 {row['titles']} titles</span>
@@ -661,7 +662,17 @@ with tab4:
                         🎭 {row['genres'][:40]}...
                     </div>
                 </div>
-            """, unsafe_allow_html=True)
+            """
+        cards_html += "</div>"
+        components.html(f"""
+            <style>
+                body {{ margin: 0; background: transparent; font-family: Inter, sans-serif; }}
+                ::-webkit-scrollbar {{ width: 4px; }}
+                ::-webkit-scrollbar-track {{ background: #1a1a1a; }}
+                ::-webkit-scrollbar-thumb {{ background: #E50914; border-radius: 4px; }}
+            </style>
+            {cards_html}
+        """, height=430, scrolling=False)
 
     top_dir = directors_detail.iloc[0]
     st.markdown(f"""
@@ -672,8 +683,128 @@ with tab4:
         </div>
     """, unsafe_allow_html=True)
 
-# ── Tab 5: Ask AI ─────────────────────────────────────────────────────────────
+# ── Tab 5: Content Explorer ───────────────────────────────────────────────────
 with tab5:
+    st.markdown('<div class="section-header">🔍 Content Explorer</div>', unsafe_allow_html=True)
+
+    # ── Filters row ───────────────────────────────────────────────────────────
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        selected_type = st.selectbox(
+            "Type",
+            options=["All", "Movie", "TV Show"]
+        )
+    with col2:
+        all_genres = sorted(set(
+            g.strip()
+            for genres in df['listed_in'].dropna()
+            for g in genres.split(',')
+        ))
+        selected_genre = st.selectbox("Genre", ["All"] + all_genres)
+
+    with col3:
+        all_ratings = sorted(df['rating'].dropna().unique().tolist())
+        selected_rating = st.selectbox("Rating", ["All"] + all_ratings)
+
+    with col4:
+        all_countries = sorted(set(
+            c.strip()
+            for countries in df['country'].dropna()
+            for c in countries.split(',')
+            if c.strip() != 'Unknown'
+        ))
+        selected_country = st.selectbox("Country", ["All"] + all_countries)
+
+    # ── Apply filters ─────────────────────────────────────────────────────────
+    explored = df.copy()
+    if selected_type != "All":
+        explored = explored[explored['type'] == selected_type]
+    if selected_genre != "All":
+        explored = explored[explored['listed_in'].str.contains(selected_genre, na=False)]
+    if selected_rating != "All":
+        explored = explored[explored['rating'] == selected_rating]
+    if selected_country != "All":
+        explored = explored[explored['country'].str.contains(selected_country, na=False)]
+
+    # ── Results count ─────────────────────────────────────────────────────────
+    st.markdown(f"""
+        <div style='margin:16px 0;font-size:0.85rem;color:#555'>
+            Showing <span style='color:#E50914;font-weight:600'>{len(explored)}</span> titles
+        </div>
+    """, unsafe_allow_html=True)
+
+    # ── Cards grid ────────────────────────────────────────────────────────────
+    if len(explored) == 0:
+        st.markdown("""
+            <div style='text-align:center;padding:60px;color:#444'>
+                😕 No titles found with these filters
+            </div>
+        """, unsafe_allow_html=True)
+    else:
+        # Show max 50 results
+        results = explored.head(50)
+
+        # Build cards HTML
+        cards = ""
+        for _, row in results.iterrows():
+            content_type_icon = "🎥" if row['type'] == "Movie" else "📺"
+            duration = str(row['duration']) if pd.notna(row['duration']) else "N/A"
+            country = str(row['country']).split(',')[0].strip() if pd.notna(row['country']) else "Unknown"
+            genres = str(row['listed_in'])[:35] if pd.notna(row['listed_in']) else "N/A"
+            description = str(row['description'])[:120] + "..." if pd.notna(row['description']) else "No description available."
+            year = int(row['release_year']) if pd.notna(row['release_year']) else "N/A"
+            rating = str(row['rating']) if pd.notna(row['rating']) else "N/A"
+            title = str(row['title'])
+
+            cards += f"""
+                <div style='background:#111;border:1px solid #222;border-radius:12px;
+                            padding:18px;margin-bottom:12px;
+                            transition:border-color 0.2s,transform 0.2s'
+                     onmouseover="this.style.borderColor='#E50914';this.style.transform='translateX(4px)'"
+                     onmouseout="this.style.borderColor='#222';this.style.transform='translateX(0)'">
+
+                    <div style='display:flex;justify-content:space-between;align-items:flex-start'>
+                        <div style='flex:1'>
+                            <div style='font-size:1rem;font-weight:600;color:#fff'>
+                                {content_type_icon} {title}
+                            </div>
+                            <div style='font-size:0.75rem;color:#555;margin-top:4px'>
+                                📅 {year} &nbsp;|&nbsp; ⏱ {duration} &nbsp;|&nbsp; 🌍 {country}
+                            </div>
+                        </div>
+                        <div style='display:flex;gap:6px;flex-shrink:0;margin-left:12px'>
+                            <span style='background:rgba(229,9,20,0.15);border:1px solid rgba(229,9,20,0.3);
+                                         color:#E50914;padding:3px 10px;border-radius:20px;font-size:0.7rem;
+                                         font-weight:600'>{rating}</span>
+                        </div>
+                    </div>
+
+                    <div style='font-size:0.78rem;color:#444;margin-top:8px;line-height:1.5'>
+                        {description}
+                    </div>
+
+                    <div style='font-size:0.7rem;color:#333;margin-top:8px'>
+                        🎭 {genres}
+                    </div>
+                </div>
+            """
+
+        import streamlit.components.v1 as components
+        components.html(f"""
+            <style>
+                body {{ margin:0; background:transparent; font-family:Inter,sans-serif; }}
+                ::-webkit-scrollbar {{ width:4px; }}
+                ::-webkit-scrollbar-track {{ background:#1a1a1a; }}
+                ::-webkit-scrollbar-thumb {{ background:#E50914; border-radius:4px; }}
+            </style>
+            <div style='height:600px;overflow-y:auto;padding-right:8px'>
+                {cards}
+            </div>
+        """, height=620, scrolling=False)
+
+# ── Tab 6: Ask AI
+with tab6:
     st.markdown("""
         <div style='margin-bottom:24px'>
             <div style='font-size:1.3rem;font-weight:600;color:#fff;margin-bottom:6px'>
