@@ -1030,8 +1030,6 @@ with tab7:
         with st.spinner("Analysing..."):
             answer, sources = ask(final_question)
         st.session_state.messages.append({"role": "assistant", "content": answer})
-        if auto_ask:
-            st.session_state['chat_input'] = ''
 
         with st.expander("📄 Data sources used"):
             for s in sources:
