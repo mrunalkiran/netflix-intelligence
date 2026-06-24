@@ -1,7 +1,6 @@
 __pycache__/
 *.pyc
 .env
-data/
-chroma_db/
+data/netflix_titles.csv
 venv/
 .vscode/
