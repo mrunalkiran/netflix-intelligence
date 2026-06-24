@@ -994,10 +994,12 @@ with tab7:
     ]
 
     st.markdown("<div style='font-size:0.8rem;color:#555;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.08em'>Quick questions</div>", unsafe_allow_html=True)
+    auto_ask = None
     cols = st.columns(3)
     for i, s in enumerate(suggestions):
         if cols[i % 3].button(s, key=f"chip_{i}"):
             st.session_state['chat_input'] = s
+            auto_ask = s
 
     st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
 
@@ -1022,13 +1024,15 @@ with tab7:
         st.session_state.messages = []
         st.rerun()
 
-    if ask_clicked and question:
-        st.session_state.messages.append({"role": "user", "content": question})
+    final_question = auto_ask or (question if ask_clicked else None)
+    if final_question:
+        st.session_state.messages.append({"role": "user", "content": final_question})
         with st.spinner("Analysing..."):
-            answer, sources = ask(question)
+            answer, sources = ask(final_question)
         st.session_state.messages.append({"role": "assistant", "content": answer})
+        if auto_ask:
+            st.session_state['chat_input'] = ''
 
-        # Sources
         with st.expander("📄 Data sources used"):
             for s in sources:
                 st.markdown(f'<span class="source-pill">📊 {s[:80]}...</span>', unsafe_allow_html=True)
