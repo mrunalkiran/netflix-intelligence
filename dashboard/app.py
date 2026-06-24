@@ -997,7 +997,7 @@ with tab7:
     cols = st.columns(3)
     for i, s in enumerate(suggestions):
         if cols[i % 3].button(s, key=f"chip_{i}"):
-            st.session_state['ai_question'] = s
+            st.session_state['chat_input'] = s
 
     st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
 
@@ -1011,13 +1011,10 @@ with tab7:
     # Input
     question = st.text_input(
         "Ask anything:",
-        value=st.session_state.get('ai_question', ''),
         placeholder="e.g. What genre dominates Netflix?",
         label_visibility="collapsed",
         key="chat_input"
     )
-    if 'ai_question' in st.session_state:
-        del st.session_state['ai_question']
 
     col_btn, col_clear = st.columns([1, 5])
     ask_clicked = col_btn.button("Ask →", type="primary")
