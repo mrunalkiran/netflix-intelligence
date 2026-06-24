@@ -1,3 +1,4 @@
+import base64
 import streamlit as st
 import streamlit.components.v1 as components
 import pandas as pd
@@ -284,7 +285,26 @@ df = get_data()
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.image("images/netflix_logo.png", width=130)
+    _logo_path = os.path.join(os.path.dirname(__file__), '..', 'images', 'netflix_logo.png')
+    with open(_logo_path, 'rb') as _f:
+        _logo_b64 = base64.b64encode(_f.read()).decode()
+    st.markdown(f"""
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+        </style>
+        <div style='display:flex;align-items:center;gap:4px;margin-bottom:8px'>
+            <img src='data:image/png;base64,{_logo_b64}' style='width:105px'>
+            <span style='
+                color:#ffffff;
+                font-size:2.5rem;
+                font-weight:400;
+                font-family:"Bebas Neue",Impact,sans-serif;
+                letter-spacing:0.02em;
+                line-height:1.8;
+                margin-top:4    px;
+            '>IP</span>
+        </div>
+    """, unsafe_allow_html=True)
     st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
     st.markdown("<div style='font-size:0.75rem;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px'>Filters</div>", unsafe_allow_html=True)
