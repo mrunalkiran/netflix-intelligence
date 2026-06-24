@@ -8,7 +8,7 @@
 [![ChromaDB](https://img.shields.io/badge/ChromaDB-1.5-orange)](https://trychroma.com)
 [![Plotly](https://img.shields.io/badge/Plotly-6.8-3F4F75?logo=plotly&logoColor=white)](https://plotly.com)
 
-**[🚀 Live Demo](YOUR_STREAMLIT_URL_HERE)**  &nbsp;|&nbsp;  **[GitHub](https://github.com/mrunalkiran/netflix-intelligence)**
+**[🚀 Live Demo](https://netflixintelligenceplatform.streamlit.app/)**  &nbsp;|&nbsp;  **[GitHub](https://github.com/mrunalkiran/netflix-intelligence)**
 
 ---
 
