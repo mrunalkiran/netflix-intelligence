@@ -359,14 +359,11 @@ with st.sidebar:
     for icon, val, label in sidebar_metrics:
         st.markdown(f"""
             <div style='background:#0d0d0d;border:1px solid #222;border-radius:8px;
-                        padding:12px 16px;margin-bottom:8px;
-                        display:flex;align-items:center;gap:14px'>
+                        padding:14px 16px;margin-bottom:8px;text-align:center'>
                 <div style='font-size:1.4rem'>{icon}</div>
-                <div>
-                    <div style='font-size:1.15rem;font-weight:700;color:#fff;line-height:1'>{val}</div>
-                    <div style='font-size:0.75rem;color:#888;margin-top:3px;
-                                text-transform:uppercase;letter-spacing:0.07em'>{label}</div>
-                </div>
+                <div style='font-size:1.15rem;font-weight:700;color:#fff;line-height:1.2;margin-top:4px'>{val}</div>
+                <div style='font-size:0.75rem;color:#888;margin-top:4px;
+                            text-transform:uppercase;letter-spacing:0.07em'>{label}</div>
             </div>
         """, unsafe_allow_html=True)
 
