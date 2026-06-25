@@ -84,7 +84,8 @@ st.markdown("""
         border-right: 1px solid #222;
     }
     [data-testid="stSidebar"] > div:first-child {
-        padding-top: 0.75rem !important;
+        padding-top: 0.25rem !important;
+        padding-bottom: 1rem !important;
     }
 
     /* Hero banner */
@@ -368,9 +369,9 @@ with st.sidebar:
     for val, label in sidebar_metrics:
         st.markdown(
             f"<div style='background:#0d0d0d;border:1px solid #222;border-radius:8px;"
-            f"padding:8px 12px;margin-bottom:6px;text-align:center'>"
-            f"<div style='font-size:1.05rem;font-weight:700;color:#fff;line-height:1.2'>{val}</div>"
-            f"<div style='font-size:0.7rem;color:#888;margin-top:2px;"
+            f"padding:22px 12px;margin-bottom:8px;text-align:center'>"
+            f"<div style='font-size:1.2rem;font-weight:700;color:#fff;line-height:1.2'>{val}</div>"
+            f"<div style='font-size:0.7rem;color:#888;margin-top:4px;"
             f"text-transform:uppercase;letter-spacing:0.06em'>{label}</div>"
             f"</div>",
             unsafe_allow_html=True
