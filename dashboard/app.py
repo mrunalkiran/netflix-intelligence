@@ -309,6 +309,12 @@ def get_data():
 
 df = get_data()
 
+# ── Session API tracking ──────────────────────────────────────────────────────
+if 'api_calls_askai' not in st.session_state:
+    st.session_state.api_calls_askai = 0
+if 'api_calls_rec' not in st.session_state:
+    st.session_state.api_calls_rec = 0
+
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
     _logo_path = os.path.join(os.path.dirname(__file__), '..', 'images', 'netflix_logo.png')
@@ -386,6 +392,24 @@ with st.sidebar:
             <div>⚡ Built with Streamlit</div>
         </div>
     """, unsafe_allow_html=True)
+
+    # ── API usage tracker ─────────────────────────────────────────────────────
+    total_calls = st.session_state.api_calls_askai + st.session_state.api_calls_rec
+    # Each ask() = 1 embedding (~20 tok @ $0.02/1M) + 1 completion (~650 tok in, ~175 tok out)
+    # gpt-3.5-turbo: $0.50/1M input, $1.50/1M output
+    est_cost = total_calls * ((650 * 0.50 + 175 * 1.50) / 1_000_000)
+    st.markdown("<div style='border-top:1px solid #222;margin:8px 0 6px'></div>", unsafe_allow_html=True)
+    st.markdown(
+        f"<div style='font-size:0.68rem;color:#444;line-height:1.9'>"
+        f"<div style='color:#555;text-transform:uppercase;letter-spacing:0.08em;font-size:0.65rem;margin-bottom:2px'>Session Usage</div>"
+        f"<div>🤖 Ask AI queries: <span style='color:#ccc'>{st.session_state.api_calls_askai}</span></div>"
+        f"<div>🍿 Recommender queries: <span style='color:#ccc'>{st.session_state.api_calls_rec}</span></div>"
+        f"<div>⚡ Total API calls: <span style='color:#ccc'>{total_calls * 2}</span> "
+        f"<span style='color:#333'>({total_calls} × 2)</span></div>"
+        f"<div>💰 Est. cost: <span style='color:#E50914'>${est_cost:.4f}</span></div>"
+        f"</div>",
+        unsafe_allow_html=True
+    )
 
 # ── Hero ──────────────────────────────────────────────────────────────────────
 st.markdown("""
@@ -901,6 +925,7 @@ with tab6:
 
             # Get RAG answer
             answer, sources = ask(query)
+            st.session_state.api_calls_rec += 1
 
         # ── AI Answer ─────────────────────────────────────────────────────────
         st.markdown(f"""
@@ -1052,6 +1077,7 @@ with tab7:
         st.session_state.messages.append({"role": "user", "content": final_question})
         with st.spinner("Analysing..."):
             answer, sources = ask(final_question)
+        st.session_state.api_calls_askai += 1
         st.session_state.messages.append({"role": "assistant", "content": answer})
 
         with st.expander("📄 Data sources used"):
