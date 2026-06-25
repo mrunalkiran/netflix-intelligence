@@ -83,6 +83,9 @@ st.markdown("""
         background-color: #111111;
         border-right: 1px solid #222;
     }
+    [data-testid="stSidebar"] > div:first-child {
+        padding-top: 0.75rem !important;
+    }
 
     /* Hero banner */
     .hero {
@@ -356,27 +359,22 @@ with st.sidebar:
 
     st.markdown("<div style='font-size:0.7rem;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin:8px 0 4px'>Stats</div>", unsafe_allow_html=True)
 
-    # 2×2 grid for metrics
-    m = [
+    sidebar_metrics = [
         (f"{len(df_f):,}", "Total Titles"),
         (f"{len(df_f[df_f['type']=='Movie']):,}", "Movies"),
         (f"{len(df_f[df_f['type']=='TV Show']):,}", "TV Shows"),
         (f"{df_f['country'].nunique():,}", "Countries"),
     ]
-    _metric_cells = ''.join(
-        f"<div style='background:#0d0d0d;border:1px solid #222;border-radius:8px;"
-        f"padding:10px 8px;text-align:center'>"
-        f"<div style='font-size:1.05rem;font-weight:700;color:#fff;line-height:1.2'>{v}</div>"
-        f"<div style='font-size:0.65rem;color:#888;margin-top:2px;"
-        f"text-transform:uppercase;letter-spacing:0.06em'>{l}</div>"
-        f"</div>"
-        for v, l in m
-    )
-    st.markdown(f"""
-        <div style='display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px'>
-            {_metric_cells}
-        </div>
-    """, unsafe_allow_html=True)
+    for val, label in sidebar_metrics:
+        st.markdown(
+            f"<div style='background:#0d0d0d;border:1px solid #222;border-radius:8px;"
+            f"padding:8px 12px;margin-bottom:6px;text-align:center'>"
+            f"<div style='font-size:1.05rem;font-weight:700;color:#fff;line-height:1.2'>{val}</div>"
+            f"<div style='font-size:0.7rem;color:#888;margin-top:2px;"
+            f"text-transform:uppercase;letter-spacing:0.06em'>{label}</div>"
+            f"</div>",
+            unsafe_allow_html=True
+        )
 
     st.markdown("<div style='border-top:1px solid #222;margin:4px 0 6px'></div>", unsafe_allow_html=True)
     st.markdown("""
