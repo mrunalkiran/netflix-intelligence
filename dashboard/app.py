@@ -318,7 +318,7 @@ with st.sidebar:
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
         </style>
-        <div style='display:flex;align-items:center;gap:4px;margin-bottom:4px'>
+        <div style='display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:4px'>
             <img src='data:image/png;base64,{_logo_b64}' style='width:130px'>
             <span style='
                 color:#ffffff;
