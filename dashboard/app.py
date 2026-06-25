@@ -319,10 +319,10 @@ with st.sidebar:
             @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
         </style>
         <div style='display:flex;align-items:center;gap:4px;margin-bottom:4px'>
-            <img src='data:image/png;base64,{_logo_b64}' style='width:90px'>
+            <img src='data:image/png;base64,{_logo_b64}' style='width:130px'>
             <span style='
                 color:#ffffff;
-                font-size:2.6rem;
+                font-size:3.6rem;
                 font-weight:400;
                 font-family:"Bebas Neue",Impact,sans-serif;
                 letter-spacing:0.02em;
