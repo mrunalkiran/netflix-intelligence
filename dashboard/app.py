@@ -351,17 +351,16 @@ with st.sidebar:
     st.markdown("<div style='font-size:0.75rem;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px'>Stats</div>", unsafe_allow_html=True)
 
     sidebar_metrics = [
-        ("🎬", f"{len(df_f):,}", "Total Titles"),
-        ("🎥", f"{len(df_f[df_f['type']=='Movie']):,}", "Movies"),
-        ("📺", f"{len(df_f[df_f['type']=='TV Show']):,}", "TV Shows"),
-        ("🌍", f"{df_f['country'].nunique():,}", "Countries"),
+        (f"{len(df_f):,}", "Total Titles"),
+        (f"{len(df_f[df_f['type']=='Movie']):,}", "Movies"),
+        (f"{len(df_f[df_f['type']=='TV Show']):,}", "TV Shows"),
+        (f"{df_f['country'].nunique():,}", "Countries"),
     ]
-    for icon, val, label in sidebar_metrics:
+    for val, label in sidebar_metrics:
         st.markdown(f"""
             <div style='background:#0d0d0d;border:1px solid #222;border-radius:8px;
                         padding:14px 16px;margin-bottom:8px;text-align:center'>
-                <div style='font-size:1.4rem'>{icon}</div>
-                <div style='font-size:1.15rem;font-weight:700;color:#fff;line-height:1.2;margin-top:4px'>{val}</div>
+                <div style='font-size:1.15rem;font-weight:700;color:#fff;line-height:1.2'>{val}</div>
                 <div style='font-size:0.75rem;color:#888;margin-top:4px;
                             text-transform:uppercase;letter-spacing:0.07em'>{label}</div>
             </div>
