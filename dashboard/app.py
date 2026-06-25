@@ -245,18 +245,21 @@ st.markdown("""
     /* Tabs */
     .stTabs [data-baseweb="tab-list"] {
         background: transparent;
-        gap: 4px;
+        gap: 0;
         border-bottom: 1px solid #222;
+        width: 100%;
     }
     .stTabs [data-baseweb="tab"] {
         background: transparent;
         color: #555;
         border-radius: 8px 8px 0 0;
-        padding: 8px 20px;
+        padding: 8px 0;
         font-weight: 500;
         font-size: 0.9rem;
         border-bottom: 2px solid transparent;
         transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        flex: 1;
+        justify-content: center;
     }
     .stTabs [data-baseweb="tab"]:hover {
         background: rgba(229,9,20,0.08) !important;
@@ -306,7 +309,7 @@ with st.sidebar:
             <img src='data:image/png;base64,{_logo_b64}' style='width:105px'>
             <span style='
                 color:#ffffff;
-                font-size:2.00rem;
+                font-size:3.00rem;
                 font-weight:400;
                 font-family:"Bebas Neue",Impact,sans-serif;
                 letter-spacing:0.02em;
