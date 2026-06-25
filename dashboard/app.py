@@ -84,7 +84,7 @@ st.markdown("""
         border-right: 1px solid #222;
     }
     [data-testid="stSidebar"] > div:first-child {
-        padding-top: 0.25rem !important;
+        padding-top: 0 !important;
         padding-bottom: 1rem !important;
     }
 
