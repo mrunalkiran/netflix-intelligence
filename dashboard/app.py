@@ -340,6 +340,34 @@ with st.sidebar:
         label_visibility="collapsed"
     )
 
+    # ── Compute filtered data inside sidebar so metrics can use it ───────────
+    df_f = df[
+        df['type'].isin(content_type) &
+        (df['year_added'] >= year_range[0]) &
+        (df['year_added'] <= year_range[1])
+    ]
+
+    st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size:0.75rem;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px'>Stats</div>", unsafe_allow_html=True)
+
+    mc1, mc2 = st.columns(2)
+    sidebar_metrics = [
+        ("🎬", f"{len(df_f):,}", "Total", mc1),
+        ("🎥", f"{len(df_f[df_f['type']=='Movie']):,}", "Movies", mc2),
+        ("📺", f"{len(df_f[df_f['type']=='TV Show']):,}", "TV Shows", mc1),
+        ("🌍", f"{df_f['country'].nunique():,}", "Countries", mc2),
+    ]
+    for icon, val, label, col in sidebar_metrics:
+        col.markdown(f"""
+            <div style='background:#0d0d0d;border:1px solid #222;border-radius:8px;
+                        padding:12px 6px;text-align:center;margin-bottom:8px'>
+                <div style='font-size:1.1rem'>{icon}</div>
+                <div style='font-size:1rem;font-weight:700;color:#fff;line-height:1.2'>{val}</div>
+                <div style='font-size:0.62rem;color:#555;margin-top:3px;text-transform:uppercase;
+                            letter-spacing:0.06em'>{label}</div>
+            </div>
+        """, unsafe_allow_html=True)
+
     st.markdown("---")
     st.markdown(f"""
         <div style='font-size:0.75rem;color:#444;line-height:1.8'>
@@ -350,13 +378,6 @@ with st.sidebar:
         </div>
     """, unsafe_allow_html=True)
 
-# ── Filter data ───────────────────────────────────────────────────────────────
-df_f = df[
-    df['type'].isin(content_type) &
-    (df['year_added'] >= year_range[0]) &
-    (df['year_added'] <= year_range[1])
-]
-
 # ── Hero ──────────────────────────────────────────────────────────────────────
 st.markdown("""
     <div class="hero">
@@ -365,25 +386,6 @@ st.markdown("""
         <div class="hero-subtitle">Explore 8,800+ titles with AI-powered insights and natural language querying</div>
     </div>
 """, unsafe_allow_html=True)
-
-# ── Metric cards ──────────────────────────────────────────────────────────────
-c1, c2, c3, c4 = st.columns(4)
-metrics = [
-    ("🎬", f"{len(df_f):,}", "Total Titles", c1),
-    ("🎥", f"{len(df_f[df_f['type']=='Movie']):,}", "Movies", c2),
-    ("📺", f"{len(df_f[df_f['type']=='TV Show']):,}", "TV Shows", c3),
-    ("🌍", f"{df_f['country'].nunique():,}", "Countries", c4),
-]
-for icon, val, label, col in metrics:
-    col.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-icon">{icon}</div>
-            <div class="metric-value">{val}</div>
-            <div class="metric-label">{label}</div>
-        </div>
-    """, unsafe_allow_html=True)
-
-st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
 
 # ── Tabs ──────────────────────────────────────────────────────────────────────
 tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(["🎭  Genres", "🌍  Countries", "📈  Growth", "🎬  Directors", "🔍  Explorer", "🍿  Recommender", "🤖  Ask AI"])
