@@ -46,26 +46,16 @@ st.markdown("""
     /* Hide default streamlit elements */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    [data-testid="stToolbar"] {visibility: hidden;}
-    [data-testid="stDecoration"] {display: none;}
-    [data-testid="stHeader"] {background: transparent !important;}
+    header {visibility: hidden;}
 
-    /* Sidebar expand button — always visible, Netflix red */
-    [data-testid="collapsedControl"] {
-        visibility: visible !important;
-        display: flex !important;
-        opacity: 1 !important;
-        position: fixed !important;
-        top: 12px !important;
-        left: 12px !important;
-        z-index: 999999 !important;
-        background: #E50914 !important;
-        border-radius: 6px !important;
-        padding: 4px !important;
+    /* Force sidebar always visible — prevent it from being collapsed */
+    section[data-testid="stSidebar"] {
+        transform: none !important;
+        min-width: 21rem !important;
     }
-    [data-testid="collapsedControl"] svg {
-        fill: #ffffff !important;
-    }
+    /* Hide collapse/expand toggle buttons so users can't accidentally hide it */
+    [data-testid="stSidebarCollapseButton"] {display: none !important;}
+    [data-testid="collapsedControl"] {display: none !important;}
 
     /* Cinematic background */
     .stApp {
