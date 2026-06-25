@@ -314,21 +314,20 @@ with st.sidebar:
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
         </style>
-        <div style='display:flex;align-items:center;gap:4px;margin-bottom:8px'>
-            <img src='data:image/png;base64,{_logo_b64}' style='width:105px'>
+        <div style='display:flex;align-items:center;gap:4px;margin-bottom:4px'>
+            <img src='data:image/png;base64,{_logo_b64}' style='width:90px'>
             <span style='
                 color:#ffffff;
-                font-size:3.00rem;
+                font-size:2.6rem;
                 font-weight:400;
                 font-family:"Bebas Neue",Impact,sans-serif;
                 letter-spacing:0.02em;
-                line-height:1%;
+                line-height:1;
             '>IP</span>
         </div>
     """, unsafe_allow_html=True)
-    st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
-    st.markdown("<div style='font-size:0.75rem;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px'>Filters</div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size:0.7rem;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px'>Filters</div>", unsafe_allow_html=True)
 
     content_type = st.multiselect(
         "Content Type",
@@ -337,8 +336,7 @@ with st.sidebar:
         label_visibility="collapsed"
     )
 
-    st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
-    st.markdown("<div style='font-size:0.75rem;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px'>Year Range</div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size:0.7rem;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin:8px 0 4px'>Year Range</div>", unsafe_allow_html=True)
 
     years = df['year_added'].dropna().astype(int)
     year_range = st.slider(
@@ -356,28 +354,30 @@ with st.sidebar:
         (df['year_added'] <= year_range[1])
     ]
 
-    st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
-    st.markdown("<div style='font-size:0.75rem;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px'>Stats</div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size:0.7rem;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin:8px 0 4px'>Stats</div>", unsafe_allow_html=True)
 
-    sidebar_metrics = [
+    # 2×2 grid for metrics
+    m = [
         (f"{len(df_f):,}", "Total Titles"),
         (f"{len(df_f[df_f['type']=='Movie']):,}", "Movies"),
         (f"{len(df_f[df_f['type']=='TV Show']):,}", "TV Shows"),
         (f"{df_f['country'].nunique():,}", "Countries"),
     ]
-    for val, label in sidebar_metrics:
-        st.markdown(f"""
-            <div style='background:#0d0d0d;border:1px solid #222;border-radius:8px;
-                        padding:14px 16px;margin-bottom:8px;text-align:center'>
-                <div style='font-size:1.15rem;font-weight:700;color:#fff;line-height:1.2'>{val}</div>
-                <div style='font-size:0.75rem;color:#888;margin-top:4px;
-                            text-transform:uppercase;letter-spacing:0.07em'>{label}</div>
-            </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown("---")
     st.markdown(f"""
-        <div style='font-size:0.75rem;color:#444;line-height:1.8'>
+        <div style='display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px'>
+            {''.join(f"""
+            <div style='background:#0d0d0d;border:1px solid #222;border-radius:8px;
+                        padding:10px 8px;text-align:center'>
+                <div style='font-size:1.05rem;font-weight:700;color:#fff;line-height:1.2'>{v}</div>
+                <div style='font-size:0.65rem;color:#888;margin-top:2px;
+                            text-transform:uppercase;letter-spacing:0.06em'>{l}</div>
+            </div>""" for v, l in m)}
+        </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<div style='border-top:1px solid #222;margin:4px 0 6px'></div>", unsafe_allow_html=True)
+    st.markdown("""
+        <div style='font-size:0.68rem;color:#444;line-height:1.7'>
             <div>📊 Dataset: Netflix Titles</div>
             <div>🤖 Model: GPT-3.5-turbo</div>
             <div>🔍 Vector DB: ChromaDB</div>
