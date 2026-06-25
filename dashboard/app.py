@@ -250,16 +250,26 @@ st.markdown("""
     }
     .stTabs [data-baseweb="tab"] {
         background: transparent;
-        color: #666;
+        color: #555;
         border-radius: 8px 8px 0 0;
         padding: 8px 20px;
         font-weight: 500;
         font-size: 0.9rem;
+        border-bottom: 2px solid transparent;
+        transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+    .stTabs [data-baseweb="tab"]:hover {
+        background: rgba(229,9,20,0.08) !important;
+        color: #ccc !important;
+        border-bottom: 2px solid rgba(229,9,20,0.35) !important;
     }
     .stTabs [aria-selected="true"] {
-        background: transparent !important;
+        background: rgba(229,9,20,0.12) !important;
         color: #E50914 !important;
         border-bottom: 2px solid #E50914 !important;
+    }
+    .stTabs [aria-selected="true"]:hover {
+        background: rgba(229,9,20,0.18) !important;
     }
 
     /* Source pills */
@@ -296,12 +306,11 @@ with st.sidebar:
             <img src='data:image/png;base64,{_logo_b64}' style='width:105px'>
             <span style='
                 color:#ffffff;
-                font-size:2.5rem;
+                font-size:12.00rem;
                 font-weight:400;
                 font-family:"Bebas Neue",Impact,sans-serif;
                 letter-spacing:0.02em;
-                line-height:1.8;
-                margin-top:4    px;
+                line-height:1%;
             '>IP</span>
         </div>
     """, unsafe_allow_html=True)
