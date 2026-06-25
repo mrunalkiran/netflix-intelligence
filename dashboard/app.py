@@ -46,7 +46,9 @@ st.markdown("""
     /* Hide default streamlit elements */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    header {visibility: hidden;}
+    [data-testid="stToolbar"] {visibility: hidden;}
+    [data-testid="stDecoration"] {display: none;}
+    [data-testid="stHeader"] {background: transparent !important;}
 
     /* Cinematic background */
     .stApp {
