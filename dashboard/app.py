@@ -306,7 +306,7 @@ with st.sidebar:
             <img src='data:image/png;base64,{_logo_b64}' style='width:105px'>
             <span style='
                 color:#ffffff;
-                font-size:12.00rem;
+                font-size:2.00rem;
                 font-weight:400;
                 font-family:"Bebas Neue",Impact,sans-serif;
                 letter-spacing:0.02em;
