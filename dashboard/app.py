@@ -363,15 +363,18 @@ with st.sidebar:
         (f"{len(df_f[df_f['type']=='TV Show']):,}", "TV Shows"),
         (f"{df_f['country'].nunique():,}", "Countries"),
     ]
+    _metric_cells = ''.join(
+        f"<div style='background:#0d0d0d;border:1px solid #222;border-radius:8px;"
+        f"padding:10px 8px;text-align:center'>"
+        f"<div style='font-size:1.05rem;font-weight:700;color:#fff;line-height:1.2'>{v}</div>"
+        f"<div style='font-size:0.65rem;color:#888;margin-top:2px;"
+        f"text-transform:uppercase;letter-spacing:0.06em'>{l}</div>"
+        f"</div>"
+        for v, l in m
+    )
     st.markdown(f"""
         <div style='display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px'>
-            {''.join(f"""
-            <div style='background:#0d0d0d;border:1px solid #222;border-radius:8px;
-                        padding:10px 8px;text-align:center'>
-                <div style='font-size:1.05rem;font-weight:700;color:#fff;line-height:1.2'>{v}</div>
-                <div style='font-size:0.65rem;color:#888;margin-top:2px;
-                            text-transform:uppercase;letter-spacing:0.06em'>{l}</div>
-            </div>""" for v, l in m)}
+            {_metric_cells}
         </div>
     """, unsafe_allow_html=True)
 
