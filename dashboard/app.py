@@ -350,21 +350,23 @@ with st.sidebar:
     st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
     st.markdown("<div style='font-size:0.75rem;color:#555;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px'>Stats</div>", unsafe_allow_html=True)
 
-    mc1, mc2 = st.columns(2)
     sidebar_metrics = [
-        ("🎬", f"{len(df_f):,}", "Total", mc1),
-        ("🎥", f"{len(df_f[df_f['type']=='Movie']):,}", "Movies", mc2),
-        ("📺", f"{len(df_f[df_f['type']=='TV Show']):,}", "TV Shows", mc1),
-        ("🌍", f"{df_f['country'].nunique():,}", "Countries", mc2),
+        ("🎬", f"{len(df_f):,}", "Total Titles"),
+        ("🎥", f"{len(df_f[df_f['type']=='Movie']):,}", "Movies"),
+        ("📺", f"{len(df_f[df_f['type']=='TV Show']):,}", "TV Shows"),
+        ("🌍", f"{df_f['country'].nunique():,}", "Countries"),
     ]
-    for icon, val, label, col in sidebar_metrics:
-        col.markdown(f"""
+    for icon, val, label in sidebar_metrics:
+        st.markdown(f"""
             <div style='background:#0d0d0d;border:1px solid #222;border-radius:8px;
-                        padding:12px 6px;text-align:center;margin-bottom:8px'>
-                <div style='font-size:1.1rem'>{icon}</div>
-                <div style='font-size:1rem;font-weight:700;color:#fff;line-height:1.2'>{val}</div>
-                <div style='font-size:0.62rem;color:#555;margin-top:3px;text-transform:uppercase;
-                            letter-spacing:0.06em'>{label}</div>
+                        padding:12px 16px;margin-bottom:8px;
+                        display:flex;align-items:center;gap:14px'>
+                <div style='font-size:1.4rem'>{icon}</div>
+                <div>
+                    <div style='font-size:1.15rem;font-weight:700;color:#fff;line-height:1'>{val}</div>
+                    <div style='font-size:0.75rem;color:#888;margin-top:3px;
+                                text-transform:uppercase;letter-spacing:0.07em'>{label}</div>
+                </div>
             </div>
         """, unsafe_allow_html=True)
 
